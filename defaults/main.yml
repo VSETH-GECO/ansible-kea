@@ -1,0 +1,20 @@
+kea_interfaces:
+  - eth0
+
+kea_mysql_host: 127.0.0.1
+kea_mysql_port: 3306
+kea_mysql_user: ''
+kea_mysql_password: ''
+kea_mysql_database: ''
+
+kea_options: []
+#  - name: domain-name-servers
+#    data: "10.233.200.1 10.233.200.2"
+
+kea_pools:
+  - subnet: 192.168.42.0/24
+    pools:
+      - pool: "192.168.42.42 - 192.168.42.50"
+    option-data:
+      - name: routers
+        data: "192.168.42.1"

@@ -1,0 +1,40 @@
+---
+  - name: Import repo GPG key
+    become: True
+    apt_key:
+      data: "{{ lookup('file', 'kea-repo.key') }}"
+      state: present
+
+  - name: Add Kea repository
+    become: True
+    apt_repository:
+      repo: 'deb https://dl.cloudsmith.io/public/isc/kea-1-7/deb/debian {{ ansible_distribution_release }} main'
+      state: present
+    register: repochanged
+
+  - name: Explicitly refresh apt cache
+    become: True
+    apt:
+      update_cache: yes
+    when: repochanged.changed
+
+  - name: Install Kea
+    become: True
+    apt:
+      name:
+        - isc-kea-dhcp4-server
+        - isc-kea-admin
+        - isc-kea-dhcp-ddns-server
+      state: present
+      update_cache: yes
+      cache_valid_time: 1800
+
+  - name: Configure Kea
+    become: True
+    template:
+      src: kea-dhcp4.conf.j2
+      dest: /etc/kea/kea-dhcp4.conf
+      owner: _kea
+      group: root
+      mode: 0640
+    notify: restart kea-dhcp4
