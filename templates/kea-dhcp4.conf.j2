@@ -151,7 +151,32 @@
     // additional forensic logging capabilities, ability to reserve hosts in
     // more flexible ways, and even add extra commands. For a list of available
     // hook libraries, see https://gitlab.isc.org/isc-projects/kea/wikis/Hooks-available.
-    //"hooks-libraries": [
+{% if kea_ha_group != '' %}
+    "hooks-libraries": [
+        {
+            "library": "/usr/lib/x86_64-linux-gnu/kea/hooks/libdhcp_lease_cmds.so",
+            "parameters": { }
+        },
+        {
+            "library": "/usr/lib/x86_64-linux-gnu/kea/hooks/libdhcp_ha.so",
+            "parameters": {
+                "high-availability": [ {
+                    "this-server-name": "{{ ansible_fqdn }}",
+                    "mode": "load-balancing",
+                    "send-lease-updates": false,
+                    "sync-leases": false,
+                    "peers": [
+{% for item in groups[kea_ha_group] %}
+                        {
+                            "name": "{{ hostvars[item]['ansible_fqdn'] }}",
+                            "url": "http://{{ hostvars[item]['ansible_default_ipv4']['address'] }}:8080/",
+                            "role": "{{ "primary" if loop.first else "secondary" }}"
+                        }{{ "," if not loop.last else "" }}
+{% endfor %}
+                    ]
+                } ]
+            }
+        }
     //  {
     //      // Forensic Logging library generates forensic type of audit trail
     //      // of all devices serviced by Kea, including their identifiers
@@ -179,7 +204,8 @@
     //          "identifier-expression": "substring(relay6[0].option[18],0,8)"
     //      }
     //  }
-    //],
+    ],
+{% endif %}
 
     // Below an example of a simple IPv4 subnet declaration. Uncomment to enable
     // it. This is a list, denoted with [ ], of structures, each denoted with

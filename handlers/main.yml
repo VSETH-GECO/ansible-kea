@@ -5,3 +5,10 @@
       name: isc-kea-dhcp4-server
       state: restarted
       enabled: yes
+
+  - name: restart kea-ctrl-agent
+    become: True
+    service:
+      name: isc-kea-ctrl-agent
+      state: restarted
+      enabled: yes

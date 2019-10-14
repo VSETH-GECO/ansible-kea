@@ -25,11 +25,12 @@
         - isc-kea-dhcp4-server
         - isc-kea-admin
         - isc-kea-dhcp-ddns-server
+        - isc-kea-ctrl-agent
       state: present
       update_cache: yes
       cache_valid_time: 1800
 
-  - name: Configure Kea
+  - name: Configure Kea DHCPv4 server
     become: True
     template:
       src: kea-dhcp4.conf.j2
@@ -38,3 +39,13 @@
       group: root
       mode: 0640
     notify: restart kea-dhcp4
+
+  - name: Configure Kea control agent
+    become: True
+    template:
+      src: kea-ctrl-agent.conf.j2
+      dest: /etc/kea/kea-ctrl-agent.conf
+      owner: _kea
+      group: root
+      mode: 0640
+    notify: restart kea-ctrl-agent

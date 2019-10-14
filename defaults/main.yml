@@ -1,6 +1,8 @@
 kea_interfaces:
   - eth0
 
+kea_ha_group: ''
+
 kea_mysql_host: 127.0.0.1
 kea_mysql_port: 3306
 kea_mysql_user: ''
